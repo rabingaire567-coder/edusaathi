@@ -3,9 +3,9 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'EduSaathi — Education. Opportunity. For Everyone.',
+  description: 'A Nepal-focused learning platform connecting students with lessons, mentors, scholarships, and opportunity.',
+  generator: 'EduSaathi',
   icons: {
     icon: [
       {

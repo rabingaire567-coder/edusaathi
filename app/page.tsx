@@ -1,47 +1,104 @@
-export default function Page() {
-  return (
-    <main
-      style={{
-        colorScheme: 'light dark',
-        position: 'relative',
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'light-dark(#fff, #000)',
-        color: 'light-dark(#000, #fff)',
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        style={{ width: 80, height: 80 }}
-        width={80}
-        height={80}
-        fill="none"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      >
-        <path
-          d="M14.2 14.2H17V6.9375C17 4.76288 15.2371 3 13.0625 3H5.8V5.8M14.2 14.2V7.79063L7.79062 14.2H14.2ZM14.2 14.2V17H6.9375C4.76288 17 3 15.2371 3 13.0625V5.8H5.8M5.8 5.8V12.2313L12.2313 5.8H5.8Z"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <p
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: 'calc(50% + 56px)',
-          transform: 'translateX(-50%)',
-          whiteSpace: 'nowrap',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: 'light-dark(#71717a, #a1a1aa)',
-        }}
-      >
-        Your v0 generation will show here.
-      </p>
+'use client'
+
+import { useMemo, useState } from 'react'
+import {
+  ArrowRight, BookOpen, Brain, Check, ChevronRight, Clock3, Download, Globe2,
+  GraduationCap, HeartHandshake, Home, Languages, Leaf, LineChart, LockKeyhole,
+  Menu, MessageCircle, MoreHorizontal, Play, Search, ShieldCheck, Sparkles,
+  Target, Trophy, Users, WifiOff, X, Zap
+} from 'lucide-react'
+
+type Role = 'student' | 'teacher' | 'parent' | 'volunteer' | 'officer'
+type Page = 'home' | 'learn' | 'scholarships' | 'mentors' | 'messages' | 'progress' | 'profile' | 'settings' | 'quiz'
+
+const resources = [
+  { title: 'Algebra foundations', subject: 'Mathematics', level: 'Grade 8', type: 'Video lesson', time: '18 min', color: 'coral', icon: '∑' },
+  { title: 'The living world of Nepal', subject: 'Science', level: 'Grade 7', type: 'Reading guide', time: '12 min', color: 'green', icon: '◒' },
+  { title: 'Writing with confidence', subject: 'English', level: 'Grade 8', type: 'Practice set', time: '25 min', color: 'blue', icon: 'Aa' },
+  { title: 'Our federal Nepal', subject: 'Social Studies', level: 'Grade 8', type: 'Audio lesson', time: '20 min', color: 'gold', icon: 'नेपाल' },
+]
+
+const scholarships = [
+  { title: 'Bright Futures Scholarship', org: 'EduSaathi Foundation', amount: 'NPR 30,000 / year', deadline: '18 days left', tag: 'Need-based', color: 'coral' },
+  { title: 'STEM Sisters Grant', org: 'Women in Innovation Nepal', amount: 'NPR 50,000 / year', deadline: '26 days left', tag: 'Girls in STEM', color: 'blue' },
+  { title: 'Rural Learner Award', org: 'Himalayan Learning Trust', amount: 'Full learning kit', deadline: '42 days left', tag: 'Rural access', color: 'green' },
+]
+
+const mentors = [
+  { name: 'Aarav Shrestha', role: 'Math & STEM mentor', meta: 'Kathmandu · 4.9 rating', initials: 'AS', color: 'coral' },
+  { name: 'Maya Gurung', role: 'English conversation', meta: 'Pokhara · 4.8 rating', initials: 'MG', color: 'green' },
+  { name: 'Nima Tamang', role: 'Career guidance', meta: 'Lalitpur · 5.0 rating', initials: 'NT', color: 'blue' },
+]
+
+const nav = [
+  { id: 'home' as Page, label: 'Overview', icon: Home },
+  { id: 'learn' as Page, label: 'Learn', icon: BookOpen },
+  { id: 'scholarships' as Page, label: 'Scholarships', icon: Trophy },
+  { id: 'mentors' as Page, label: 'Mentors', icon: Users },
+  { id: 'messages' as Page, label: 'Messages', icon: MessageCircle },
+  { id: 'progress' as Page, label: 'My progress', icon: LineChart },
+]
+
+export default function PageComponent() {
+  const [authenticated, setAuthenticated] = useState(false)
+  const [page, setPage] = useState<Page>('home')
+  const [role, setRole] = useState<Role>('student')
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [language, setLanguage] = useState('EN')
+  const [search, setSearch] = useState('')
+  const [toast, setToast] = useState('')
+  const [quizStarted, setQuizStarted] = useState(false)
+
+  const notify = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2600) }
+  const filtered = useMemo(() => resources.filter((item) => item.title.toLowerCase().includes(search.toLowerCase()) || item.subject.toLowerCase().includes(search.toLowerCase())), [search])
+
+  if (!authenticated) return <Landing onStart={() => setAuthenticated(true)} />
+
+  const isHome = page === 'home'
+  const title = page === 'home' ? `Good morning, Saanvi` : page === 'learn' ? 'Your learning library' : page === 'scholarships' ? 'Find your next opportunity' : page === 'mentors' ? 'A community behind you' : page === 'messages' ? 'Messages' : page === 'progress' ? 'Your progress' : page === 'profile' ? 'Your profile' : page === 'settings' ? 'Settings' : 'Practice quiz'
+
+  return <div className="app-shell">
+    <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
+      <div className="brand"><span className="brand-mark"><Leaf size={18} /></span><span>Edu<span>Saathi</span></span></div>
+      <div className="role-pill"><span className="online-dot" /> Student space <ChevronRight size={14} /></div>
+      <nav className="side-nav" aria-label="Main navigation">
+        <p className="eyebrow">Workspace</p>
+        {nav.map((item) => { const Icon = item.icon; return <button key={item.id} onClick={() => { setPage(item.id); setMobileOpen(false) }} className={page === item.id ? 'active' : ''}><Icon size={18} />{item.label}{item.id === 'messages' && <b className="nav-count">2</b>}</button> })}
+        <p className="eyebrow role-label">Community</p>
+        <button onClick={() => notify('Ask EduSaathi is ready for your question')}><Brain size={18} />Ask EduSaathi<Sparkles size={14} className="sparkle" /></button>
+        <button onClick={() => notify('Offline library opened')}><WifiOff size={18} />Offline library</button>
+      </nav>
+      <div className="side-bottom"><div className="offline-card"><WifiOff size={17} /><div><strong>Learning offline</strong><small>12 resources saved</small></div><Check size={15} /></div><button className="profile-mini" onClick={() => setPage('profile')}><span className="avatar avatar-coral">S</span><span><strong>Saanvi Rai</strong><small>Grade 8 · Baglung</small></span><MoreHorizontal size={17} /></button></div>
+    </aside>
+    <main className="main-area">
+      <header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Open menu"><Menu /></button><div className="breadcrumb"><span>EduSaathi</span><ChevronRight size={15} /> <strong>{title}</strong></div><div className="top-actions"><button className="lang-button" onClick={() => setLanguage(language === 'EN' ? 'नेपाली' : 'EN')}><Languages size={16} /> {language}</button><button className="icon-button" onClick={() => setPage('messages')} aria-label="Notifications"><span className="notification-dot" /><MessageCircle size={19} /></button><button className="avatar avatar-coral top-avatar" onClick={() => setPage('profile')}>S</button></div></header>
+      <div className="content">
+        {isHome && <Dashboard onNavigate={setPage} notify={notify} />}
+        {page === 'learn' && <Learn search={search} setSearch={setSearch} resources={filtered} notify={notify} onQuiz={() => setPage('quiz')} />}
+        {page === 'scholarships' && <Scholarships notify={notify} />}
+        {page === 'mentors' && <Mentors notify={notify} />}
+        {page === 'messages' && <Messages notify={notify} />}
+        {page === 'progress' && <Progress />}
+        {page === 'profile' && <Profile role={role} setRole={setRole} notify={notify} />}
+        {page === 'settings' && <Settings language={language} setLanguage={setLanguage} notify={notify} />}
+        {page === 'quiz' && <Quiz started={quizStarted} setStarted={setQuizStarted} notify={notify} />}
+      </div>
     </main>
-  )
+    <nav className="bottom-nav">{nav.slice(0, 5).map((item) => { const Icon = item.icon; return <button key={item.id} onClick={() => setPage(item.id)} className={page === item.id ? 'active' : ''}><Icon size={19} /><span>{item.label.split(' ')[0]}</span></button> })}</nav>
+    {toast && <div className="toast"><Check size={17} />{toast}<button onClick={() => setToast('')}><X size={14} /></button></div>}
+  </div>
 }
+
+function Landing({ onStart }: { onStart: () => void }) { return <main className="landing"><div className="landing-nav"><div className="brand dark-brand"><span className="brand-mark"><Leaf size={18} /></span><span>Edu<span>Saathi</span></span></div><div className="landing-links"><a href="#how">How it works</a><a href="#community">Community</a><a href="#about">Our mission</a></div><button className="text-button" onClick={onStart}>Sign in <ArrowRight size={16} /></button></div><section className="hero"><div className="hero-copy"><div className="kicker"><span /> Built for every learner in Nepal</div><h1>Education should not depend on <em>where a child is born.</em></h1><p>One caring space for lessons, mentors, scholarships, and the confidence to go further — whether you learn in a city classroom or a mountain village.</p><div className="hero-actions"><button className="primary-button" onClick={onStart}>Start learning <ArrowRight size={17} /></button><button className="secondary-button" onClick={onStart}>Join EduSaathi</button></div><div className="trust-row"><div className="avatars"><span className="avatar avatar-coral">A</span><span className="avatar avatar-green">M</span><span className="avatar avatar-blue">N</span><span className="avatar avatar-gold">+</span></div><span><strong>12,000+</strong> learners finding their way forward</span></div></div><div className="hero-art"><div className="sun" /><div className="mountain mountain-back" /><div className="mountain mountain-front" /><div className="hero-card hero-card-main"><div className="card-label"><span className="live-dot" /> Today&apos;s learning</div><div className="hero-progress"><span className="ring">72%</span><div><strong>Keep your streak alive</strong><small>3 lessons to go this week</small></div></div><div className="mini-track"><span /></div></div><div className="hero-card hero-card-float"><Sparkles size={16} /><strong>Small steps, big futures.</strong><small>Every lesson counts.</small></div><div className="location-chip"><span>⌁</span> Baglung, Nepal</div></div></section><section className="impact-strip" id="how"><div><strong>01</strong><span><BookOpen size={18} /> Learn without limits</span><small>Curriculum-aligned resources that work offline.</small></div><div><strong>02</strong><span><HeartHandshake size={18} /> Find your people</span><small>Mentors and volunteers who believe in you.</small></div><div><strong>03</strong><span><Target size={18} /> See what&apos;s possible</span><small>Scholarships and opportunities, made visible.</small></div></section></main> }
+
+function Dashboard({ onNavigate, notify }: { onNavigate: (p: Page) => void; notify: (s: string) => void }) { return <div className="dashboard"><div className="welcome-row"><div><div className="kicker coral-kicker"><span /> Tuesday, 14 October 2025</div><h1>Good morning, Saanvi <span>✦</span></h1><p>Ready to make today count? Your next small win is waiting.</p></div><button className="primary-button" onClick={() => onNavigate('learn')}><Play size={16} fill="currentColor" /> Continue learning</button></div><div className="stats-grid"><Stat icon={BookOpen} label="Lessons completed" value="24" detail="+3 this week" color="coral" /><Stat icon={Clock3} label="Learning hours" value="18.5" detail="On track for goal" color="blue" /><Stat icon={Target} label="Quiz average" value="86%" detail="+8% this month" color="green" /><Stat icon={Zap} label="Current streak" value="7 days" detail="Best: 12 days" color="gold" /></div><div className="dashboard-grid"><section className="card continue-card"><div className="section-heading"><div><span className="eyebrow">Pick up where you left off</span><h2>Algebra foundations</h2></div><button className="ghost-button" onClick={() => onNavigate('learn')}>View library <ArrowRight size={15} /></button></div><div className="lesson-feature"><div className="lesson-icon coral-block">∑</div><div className="lesson-info"><div className="tag-row"><span className="tag tag-coral">Mathematics</span><span className="muted">Lesson 4 of 8</span></div><h3>Linear equations, made simple</h3><p>Understand how equations describe real things around us.</p><div className="progress-line"><span style={{ width: '58%' }} /></div><small>58% complete · 12 min remaining</small></div><button className="round-arrow" onClick={() => notify('Opening Algebra foundations')}><ArrowRight /></button></div></section><section className="card ask-card"><div className="ask-orb"><Brain size={25} /></div><span className="eyebrow">Your study companion</span><h2>Ask EduSaathi</h2><p>Curious about something? Ask a question and learn in your own way.</p><button className="secondary-button" onClick={() => notify('Ask EduSaathi is ready for your question')}>Ask a question <ArrowRight size={15} /></button></section><section className="card opportunity-card"><div className="section-heading"><div><span className="eyebrow">For your future</span><h2>Opportunities for you</h2></div><button className="ghost-button" onClick={() => onNavigate('scholarships')}>See all <ArrowRight size={15} /></button></div><div className="opportunity-list">{scholarships.slice(0, 2).map((item) => <div className="opportunity" key={item.title}><span className={`opportunity-icon ${item.color}`}>{item.color === 'coral' ? '↗' : '✦'}</span><div><strong>{item.title}</strong><small>{item.tag} · {item.deadline}</small></div><ChevronRight size={16} /></div>)}</div></section><section className="card streak-card"><div className="streak-top"><div><span className="eyebrow">Weekly rhythm</span><h2>Keep showing up</h2></div><span className="streak-number">7 <small>days</small></span></div><div className="week"><span className="done">M<Check /></span><span className="done">T<Check /></span><span className="done">W<Check /></span><span className="done">T<Check /></span><span className="today">F</span><span>S</span><span>S</span></div><p><Zap size={15} /> One lesson today keeps your streak going.</p></section></div></div> }
+
+function Stat({ icon: Icon, label, value, detail, color }: any) { return <div className="stat-card"><span className={`stat-icon ${color}`}><Icon size={18} /></span><div><small>{label}</small><strong>{value}</strong><em className={color === 'coral' || color === 'green' ? 'positive' : ''}>{detail}</em></div></div> }
+function Learn({ search, setSearch, resources, notify, onQuiz }: any) { return <div className="page-view"><div className="page-intro"><div><span className="eyebrow">The learning library</span><h1>Learn at your pace.</h1><p>Short, clear lessons designed for curious minds — even when the internet is not around.</p></div><button className="secondary-button" onClick={() => notify('Offline library synced')}> <WifiOff size={16} /> 12 saved offline</button></div><div className="search-row"><div className="search-box"><Search size={18} /><input aria-label="Search resources" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search lessons, subjects, topics..." /></div><div className="filter-pills"><button className="selected">All resources</button><button>Videos</button><button>Practice</button><button>Readings</button></div></div><div className="resource-grid">{resources.map((r: any) => <div className="resource-card" key={r.title}><div className={`resource-cover ${r.color}`}><span>{r.icon}</span><button onClick={() => notify(`${r.title} saved for offline`)} aria-label={`Download ${r.title}`}><Download size={16} /></button></div><div className="resource-body"><div className="tag-row"><span className={`tag tag-${r.color}`}>{r.subject}</span><small>{r.level}</small></div><h3>{r.title}</h3><p>{r.type} <span>·</span> {r.time}</p><button className="resource-link" onClick={onQuiz}>Start lesson <ArrowRight size={15} /></button></div></div>)}</div></div> }
+function Scholarships({ notify }: any) { return <div className="page-view"><div className="page-intro opportunity-intro"><div><span className="eyebrow">Opportunity finder <span className="demo-badge">Prototype data</span></span><h1>Make room for your dreams.</h1><p>Discover scholarships and support programs curated for learners across Nepal.</p></div><div className="big-stat"><strong>48</strong><span>open opportunities<br />for you</span></div></div><div className="filter-bar"><button className="selected">Best match</button><button>Deadline soon</button><button>Need-based</button><button>Girls in STEM</button><span className="filter-spacer" /><button onClick={() => notify('Filters updated')}><Search size={16} /> Filter</button></div><div className="scholarship-list">{scholarships.map((s) => <div className="scholarship-card" key={s.title}><div className={`scholarship-mark ${s.color}`}>✦</div><div className="scholarship-main"><div className="tag-row"><span className={`tag tag-${s.color}`}>{s.tag}</span><span className="demo-badge">Demo opportunity</span></div><h2>{s.title}</h2><p>{s.org}</p><div className="scholarship-details"><span><GraduationCap size={15} /> {s.amount}</span><span><Clock3 size={15} /> {s.deadline}</span></div></div><button className="secondary-button" onClick={() => notify(`Application guide opened for ${s.title}`)}>View opportunity <ArrowRight size={15} /></button></div>)}</div></div> }
+function Mentors({ notify }: any) { return <div className="page-view"><div className="page-intro"><div><span className="eyebrow">Community support</span><h1>You don&apos;t have to figure it out alone.</h1><p>Meet a mentor or volunteer who can help you take your next step.</p></div><button className="primary-button" onClick={() => notify('Mentor matching is a prototype')}>Find my match <HeartHandshake size={16} /></button></div><div className="community-banner"><div className="community-icon"><Users /></div><div><strong>A little guidance goes a long way.</strong><p>Our community is built on kindness, safety, and shared knowledge.</p></div><span className="community-count">2,400+ <small>community members</small></span></div><div className="section-heading compact"><div><span className="eyebrow">Recommended for you</span><h2>People who can help</h2></div><button className="ghost-button">View all <ArrowRight size={15} /></button></div><div className="mentor-grid">{mentors.map((m) => <div className="mentor-card" key={m.name}><div className={`mentor-avatar ${m.color}`}>{m.initials}</div><div className="mentor-rating">★ 4.9</div><h3>{m.name}</h3><p>{m.role}</p><small>{m.meta}</small><button className="secondary-button" onClick={() => notify(`Message request sent to ${m.name}`)}>Say hello <MessageCircle size={15} /></button></div>)}</div></div> }
+function Messages({ notify }: any) { return <div className="page-view"><div className="page-intro"><div><span className="eyebrow">Your community</span><h1>Messages</h1><p>Conversations with the people cheering you on.</p></div><button className="primary-button" onClick={() => notify('New message composer opened')}>New message <MessageCircle size={16} /></button></div><div className="messages-layout"><div className="card conversation-list"><div className="search-box"><Search size={16} /><input placeholder="Search messages" /></div>{['Maya Gurung · Mentor','EduSaathi support','Aarav Shrestha · Mentor'].map((n, i) => <button className={`conversation ${i === 0 ? 'selected' : ''}`} key={n}><span className={`avatar avatar-${i === 0 ? 'green' : i === 1 ? 'blue' : 'coral'}`}>{n[0]}</span><span><strong>{n}</strong><small>{i === 0 ? 'Remember to bring your...' : 'You have a new update'}</small></span><time>{i === 0 ? '10:42' : 'Mon'}</time></button>)}</div><div className="card chat-window"><div className="chat-head"><span className="avatar avatar-green">M</span><div><strong>Maya Gurung</strong><small>English conversation · Usually replies in a few hours</small></div><MoreHorizontal /></div><div className="chat-body"><div className="chat-date">TODAY</div><div className="bubble their">Hi Saanvi! How did your presentation go?</div><div className="bubble mine">It went well! I used the new introduction you taught me.</div><div className="bubble their">I&apos;m so happy to hear that. Keep trusting your voice — it&apos;s getting stronger.</div></div><div className="chat-input"><input placeholder="Write a message..." /><button onClick={() => notify('Message sent')}><ArrowRight /></button></div></div></div></div> }
+function Progress() { return <div className="page-view"><div className="page-intro"><div><span className="eyebrow">Your learning journey</span><h1>Progress that feels like progress.</h1><p>Every hour you put in is a step toward the future you&apos;re building.</p></div></div><div className="progress-hero card"><div><span className="eyebrow">This month</span><h2>You&apos;re building a strong rhythm.</h2><p>Keep going — you&apos;re 18% ahead of your monthly learning goal.</p><div className="progress-line large"><span style={{ width: '78%' }} /></div><small>31 of 40 hours · 9 hours to go</small></div><div className="progress-ring"><strong>78<span>%</span></strong><small>monthly goal</small></div></div><div className="progress-columns"><div className="card"><span className="eyebrow">Subject confidence</span><h2>Where you&apos;re growing</h2>{[['Mathematics','78%','coral'],['Science','91%','green'],['English','84%','blue'],['Social Studies','68%','gold']].map(([a,b,c]) => <div className="subject" key={a}><div><span>{a}</span><strong>{b}</strong></div><div className="progress-line"><span className={c} style={{ width: b }} /></div></div>)}</div><div className="card achievements"><span className="eyebrow">Your wins</span><h2>Achievements</h2><div className="achievement"><span>✦</span><div><strong>Curious mind</strong><small>Completed 20 lessons</small></div><Check /></div><div className="achievement"><span>♢</span><div><strong>Seven-day spark</strong><small>Kept a 7 day streak</small></div><Check /></div><div className="achievement locked"><span><LockKeyhole size={17} /></span><div><strong>Quiz champion</strong><small>Score 90% on 5 quizzes</small></div></div></div></div></div> }
+function Profile({ role, setRole, notify }: any) { return <div className="page-view"><div className="profile-cover"><div className="profile-avatar">S</div><div><h1>Saanvi Rai</h1><p>Grade 8 learner · Baglung, Nepal</p></div><button className="secondary-button" onClick={() => notify('Profile editor opened')}>Edit profile</button></div><div className="profile-grid"><div className="card profile-about"><span className="eyebrow">About you</span><h2>Your learning identity</h2><p>You&apos;re a curious learner who loves science, stories, and asking the questions other people forget to ask.</p><div className="interest-tags"><span>Science</span><span>Storytelling</span><span>Sketching</span></div></div><div className="card demo-role"><span className="eyebrow">Hackathon demo</span><h2>Preview other spaces</h2><p>Switch roles to explore EduSaathi&apos;s full ecosystem.</p><select value={role} onChange={(e) => { setRole(e.target.value); notify(`Previewing ${e.target.value} dashboard`) }}><option value="student">Student dashboard</option><option value="teacher">Teacher dashboard</option><option value="parent">Parent dashboard</option><option value="volunteer">Volunteer dashboard</option><option value="officer">Education officer dashboard</option></select><div className="role-preview"><ShieldCheck size={16} /> Role-based access is enabled</div></div></div></div> }
+function Settings({ language, setLanguage, notify }: any) { return <div className="page-view"><div className="page-intro"><div><span className="eyebrow">Preferences</span><h1>Make EduSaathi yours.</h1><p>Choose how you learn, connect, and stay in the loop.</p></div></div><div className="settings-card card"><div className="setting-row"><div><strong>Language</strong><small>Choose the language you&apos;re most comfortable learning in.</small></div><select value={language} onChange={(e) => { setLanguage(e.target.value); notify('Language preference saved') }}><option>EN</option><option>नेपाली</option><option>मैथिली</option><option>भोजपुरी</option></select></div><div className="setting-row"><div><strong>Weekly learning reminder</strong><small>Get a gentle nudge when it&apos;s time to learn.</small></div><span className="toggle on"><span /></span></div><div className="setting-row"><div><strong>Offline-first mode</strong><small>Automatically save recommended resources for low-connectivity moments.</small></div><span className="toggle on"><span /></span></div><div className="setting-row"><div><strong>Privacy & safety</strong><small>Your personal information is never shared without your consent.</small></div><button className="ghost-button">Manage <ChevronRight size={15} /></button></div></div></div> }
+function Quiz({ started, setStarted, notify }: any) { const [answer, setAnswer] = useState(''); return <div className="page-view quiz-view"><div className="quiz-top"><button className="ghost-button" onClick={() => notify('Quiz saved for later')}><ChevronRight size={15} /> Exit quiz</button><span>1 of 5</span><span>12:48</span></div><div className="quiz-progress"><span style={{ width: started ? '20%' : '0%' }} /></div>{!started ? <div className="quiz-intro card"><div className="quiz-icon">∑</div><span className="eyebrow">Mathematics · Grade 8</span><h1>Linear equations, made simple</h1><p>Five friendly questions to help you check your understanding. No pressure — just practice.</p><div className="quiz-meta"><span><Clock3 size={16} /> 10 minutes</span><span><Target size={16} /> 5 questions</span><span><Trophy size={16} /> Earn 50 points</span></div><button className="primary-button" onClick={() => setStarted(true)}>Start quiz <ArrowRight size={16} /></button></div> : <div className="question-card card"><span className="eyebrow">Question 1 of 5</span><h1>If 3x + 4 = 19, what is x?</h1><p>Take your time. You&apos;ve got this.</p><div className="answers">{['3','5','7','9'].map((a) => <button key={a} className={answer === a ? 'chosen' : ''} onClick={() => setAnswer(a)}><span>{a}</span>{answer === a && <Check />}</button>)}</div><button className="primary-button next-button" disabled={!answer} onClick={() => notify('Correct! You earned 10 points')}>Check answer <ArrowRight size={16} /></button></div>}</div> }
